@@ -2,8 +2,8 @@
 
 This is the skeleton project for the
 [Reacl](https://github.com/active-group/reacl)
-[tutorial](http://cufp.org/2015/t11-michael-sperber-clojure-script.html)
-at [CUFP 2015](http://cufp.org/2015/).
+[tutorial](https://icfp18.sigplan.org/event/icfp-2018-tutorials-purely-functional-uis-with-reacl)
+at [ICFP 2018](https://icfp18.sigplan.org/home).
 
 ## Tutorial preparations
 
@@ -33,6 +33,6 @@ much time on editor support for Clojure at the tutorial.
 
 ## License
 
-Copyright © 2015 Mike Sperber
+Copyright © 2018 Mike Sperber
 
 Distributed under the Eclipse Public License either version 1.0 or (at your option) any later version.
