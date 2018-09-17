@@ -1,12 +1,12 @@
 (defproject reacl-tutorial "0.1.0-SNAPSHOT"
   :description "Reacl tutorial"
   :url "https://github.com/active-group/reacl-tutorial"
-  :dependencies [[org.clojure/clojure "1.7.0"]
-                 [org.clojure/clojurescript "1.7.107" :classifier "aot"]
-                 [reacl "1.4.0"]]
-  :plugins [[lein-cljsbuild "1.0.6"]
-            [lein-ring "0.9.6"]
-            [lein-figwheel "0.3.7"]]
+  :dependencies [[org.clojure/clojure "1.9.0"]
+                 [org.clojure/clojurescript "1.10.238"]
+                 [reacl "2.0.2"]]
+  :plugins [[lein-cljsbuild "1.1.7"]
+            [lein-ring "0.12.4"]
+            [lein-figwheel "0.5.16"]]
 
   :hooks [leiningen.cljsbuild]
   :source-paths ["src/clj"]
