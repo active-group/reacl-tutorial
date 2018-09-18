@@ -3,7 +3,7 @@
             [reacl2.dom :as dom :include-macros true]
             [reacl2.test-util :as reacl-test]
             [cljs.test :as t]
-            [reacl-tutorial.core :refer (string-display 
+            #_[reacl-tutorial.core :refer (string-display 
                                          list-display
                                          contacts
                                          contacts-display
@@ -12,7 +12,7 @@
 
 (enable-console-print!)
 
-(deftest string-display-test
+#_(deftest string-display-test
   (let [e (string-display "Hello, Mike")
         renderer (reacl-test/create-renderer)]
     (reacl-test/render! renderer e)
@@ -21,7 +21,7 @@
       (is (reacl-test/element-has-type? t :h1))
       (is (= ["Hello, Mike"] (reacl-test/element-children t))))))
 
-(deftest list-display-test
+#_(deftest list-display-test
   (let [e (list-display ["Lion" "Zebra" "Buffalo" "Antelope"])
         renderer (reacl-test/create-renderer)]
     (reacl-test/render! renderer e)
@@ -30,7 +30,7 @@
       (doseq [c (reacl-test/element-children t)]
         (is (reacl-test/element-has-type? c :li))))))
 
-(deftest contacts-display-handle-message-test
+#_(deftest contacts-display-handle-message-test
   (let [[_ st] (reacl-test/handle-message contacts-display [{:first "David" :last "Frese"}] [] "Foo"
                                           (->Add {:first "Mike" :last "Sperber"}))]
     (is (= [{:first "David", :last "Frese"} {:first "Mike", :last "Sperber"}]
@@ -40,7 +40,7 @@
     (is (= "David Frese"
            (:local-state st)))))
 
-(deftest contacts-display-test
+#_(deftest contacts-display-test
   (let [e (contacts-display contacts)
         renderer (reacl-test/create-renderer)]
     (reacl-test/render! renderer e)
