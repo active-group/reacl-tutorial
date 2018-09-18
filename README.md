@@ -16,7 +16,7 @@ lein build-dev
 
 in this directory.  Your browser should display a web page that says
 "Reacl Tutorial".  If your browser does not come up, point it to
-[`http://localhost:3449/`](http://localhost:3449/).
+[`http://localhost:9500/`](http://localhost:9500/).
 
 If any of the above doesn't work as described, don't hesitate to contact me
 directly.
