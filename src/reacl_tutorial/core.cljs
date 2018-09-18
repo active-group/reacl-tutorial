@@ -1,6 +1,6 @@
 (ns reacl-tutorial.core
-  (:require [reacl.core :as reacl :include-macros true]
-            [reacl.dom :as dom :include-macros true]
+  (:require [reacl2.core :as reacl :include-macros true]
+            [reacl2.dom :as dom :include-macros true]
             [clojure.string :as string]))
 
 (enable-console-print!)
@@ -74,7 +74,7 @@
   (dom/div
    (dom/h2 "Contact list")
    (dom/ul
-    (map (fn [c] (contact-display c reacl/no-reaction this)) data)))
+    (map (fn [c] (contact-display c this)) data)))
   handle-message
   (fn [msg]
     (reacl/return :app-state
@@ -84,13 +84,13 @@
 (defrecord Add [contact])
 
 (reacl/defclass contacts-display
-  this data new-text []
-  initial-state ""
+  this data []
+  local-state [new-text ""]
   render
   (dom/div
    (dom/h2 "Contact list")
    (dom/ul
-    (map (fn [c] (contact-display c reacl/no-reaction this)) data))
+    (map (fn [c] (contact-display c this)) data))
    (dom/div
     (dom/input {:type "text" :value new-text
                 :onchange (fn [e] (reacl/send-message! this
@@ -179,9 +179,9 @@
 (defrecord CommitEdit [])
 
 (reacl/defclass editable
-  this text local-state []
+  this text []
 
-  initial-state (->EditableLocalState text false)
+  local-state [local-state (->EditableLocalState text false)]
   
   render
   (let [editing? (:editing? local-state)
@@ -226,7 +226,7 @@
   render
   (dom/div {:id "classes"}
            (dom/h2 "Classes")
-           (map (fn [[key name]] (editable name (reacl/reaction this (fn [name] (->ChangeClassName key name)))))
+           (map (fn [[key name]] (editable (reacl/opt :reaction (reacl/reaction this (fn [name] (->ChangeClassName key name)))) name))
                 (:classes data)))
 
   handle-message
