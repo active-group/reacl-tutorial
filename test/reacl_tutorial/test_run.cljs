@@ -4,7 +4,5 @@
 
 (enable-console-print!)
 
-(defn ^:export run
-  []
-  (run-tests 'reacl-tutorial.core-test))
+(run-tests 'reacl-tutorial.core-test)
 
