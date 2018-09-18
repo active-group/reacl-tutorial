@@ -1,7 +1,7 @@
 (ns reacl-tutorial.core-test
-  (:require [reacl.core :as reacl :include-macros true]
-            [reacl.dom :as dom :include-macros true]
-            [reacl.test-util :as reacl-test]
+  (:require [reacl2.core :as reacl :include-macros true]
+            [reacl2.dom :as dom :include-macros true]
+            [reacl2.test-util :as reacl-test]
             [cljs.test :as t]
             [reacl-tutorial.core :refer (string-display 
                                          list-display
@@ -31,12 +31,12 @@
         (is (reacl-test/element-has-type? c :li))))))
 
 (deftest contacts-display-handle-message-test
-  (let [st (reacl-test/handle-message contacts-display [{:first "David" :last "Frese"}] [] "Foo"
-                                      (->Add {:first "Mike" :last "Sperber"}))]
+  (let [[_ st] (reacl-test/handle-message contacts-display [{:first "David" :last "Frese"}] [] "Foo"
+                                          (->Add {:first "Mike" :last "Sperber"}))]
     (is (= [{:first "David", :last "Frese"} {:first "Mike", :last "Sperber"}]
            (:app-state st))))
-  (let [st (reacl-test/handle-message contacts-display [{:first "David" :last "Frese"}] [] "Foo"
-                                      (->NewText "David Frese"))]
+  (let [[_ st] (reacl-test/handle-message contacts-display [{:first "David" :last "Frese"}] [] "Foo"
+                                          (->NewText "David Frese"))]
     (is (= "David Frese"
            (:local-state st)))))
 
