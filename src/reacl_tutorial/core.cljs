@@ -50,7 +50,7 @@
     :6946 "The Structure and Interpretation of Classical Mechanics"
     :1806 "Linear Algebra"}})
 
-(reacl/defview demo
+(reacl/defclass demo
   this []
   render
   (dom/h1 "Reacl Tutorial"))
