@@ -18,6 +18,10 @@ in this directory.  Your browser should display a web page that says
 "Reacl Tutorial".  If your browser does not come up, point it to
 [`http://localhost:9500/`](http://localhost:9500/).
 
+To run the tests, go to
+[`http://localhost:9500/figwheel-extra-main/tests'](http://localhost:9500/figwheel-extra-main/tests)
+and open the JavaScript console in your browser.
+
 If any of the above doesn't work as described, don't hesitate to contact me
 directly.
 
