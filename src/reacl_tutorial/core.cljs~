@@ -1,5 +1,0 @@
-(ns reacl-tutorial.core)
-
-(enable-console-print!)
-
-(println "Hello world!")
