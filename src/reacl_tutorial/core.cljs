@@ -1,4 +1,4 @@
-(ns ^:figwheel-always reacl-tutorial.core
+(ns reacl-tutorial.core
   (:require [reacl.core :as reacl :include-macros true]
             [reacl.dom :as dom :include-macros true]
             [clojure.string :as string]))
