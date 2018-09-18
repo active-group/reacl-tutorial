@@ -7,12 +7,11 @@ at [ICFP 2018](https://icfp18.sigplan.org/home).
 
 ## Tutorial preparations
 
-You should clone this repository, [install Java JDK
-8](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html),
+You should clone this repository, install Java JDK,
 [install Leiningen](http://leiningen.org/#install), and run
 
 ```
-lein figwheel
+lein build-dev
 ```
 
 in this directory.  Your browser should display a web page that says
