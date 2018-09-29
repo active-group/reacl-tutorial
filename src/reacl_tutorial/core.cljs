@@ -34,8 +34,10 @@
         (== c 1) (assoc :middle-initial middle)
         (>= c 2) (assoc :middle middle)))))
 
+(defrecord Registry [people classes])
+
 (def registry
-  {:people
+  (->Registry
    [{:type :student :first "Ben" :last "Bitdiddle" :email "benb@mit.edu"}
     {:type :student :first "Alyssa" :middle-initial "P" :last "Hacker"
      :email "aphacker@mit.edu"}
@@ -45,10 +47,9 @@
     {:type :student :first "Louis" :last "Reasoner" :email "prolog@mit.edu"}
     {:type :professor :first "Hal" :last "Abelson" :email "evalapply@mit.edu"
      :classes [:6001]}]
-   :classes
    {:6001 "The Structure and Interpretation of Computer Programs"
     :6946 "The Structure and Interpretation of Classical Mechanics"
-    :1806 "Linear Algebra"}})
+    :1806 "Linear Algebra"}))
 
 (reacl/defclass demo
   this []
