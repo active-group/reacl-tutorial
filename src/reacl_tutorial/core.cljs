@@ -7,24 +7,6 @@
 
 (println "Hello world!")
 
-(reacl/defclass string-display
-  this s []
-  render
-  (dom/h1 s)
-  handle-message
-  (fn [new]
-    (reacl/return :app-state new)))
-
-(defn stripe
-  [bgc text]
-  (dom/li {:style {:background-color bgc}} text))
-
-(reacl/defclass list-display
-  this lis []
-  render
-  (dom/ul {:class "animals"}
-   (map stripe (cycle ["#ff0" "#fff"]) lis)))
-
 (def contacts
   [{:first "Ben" :last "Bitdiddle" :email "benb@mit.edu"}
    {:first "Alyssa" :middle-initial "P" :last "Hacker" :email "aphacker@mit.edu"}
@@ -52,68 +34,10 @@
         (== c 1) (assoc :middle-initial middle)
         (>= c 2) (assoc :middle middle)))))
 
-#_(reacl/defclass contact-display
-  this contact [parent] ; parent later
-  render
-  (dom/li
-   (dom/span (display-name contact))
-   (dom/button {:onclick (fn [e] (reacl/send-message! parent contact))} "Delete"))) ; add later
-
-(defrecord Delete [contact])
-
-(reacl/defclass contact-display
-  this contact [parent] ; parent later
-  render
-  (dom/li
-   (dom/span (display-name contact))
-   (dom/button {:onclick (fn [e] (reacl/send-message! parent (->Delete contact)))} "Delete")))
-
-#_(reacl/defclass contacts-display
-  this data []
-  render
-  (dom/div
-   (dom/h2 "Contact list")
-   (dom/ul
-    (map (fn [c] (contact-display c this)) data)))
-  handle-message
-  (fn [msg]
-    (reacl/return :app-state
-                  (vec (remove (fn [c] (= c msg)) data)))))
-
-(defrecord NewText [text])
-(defrecord Add [contact])
-
-(reacl/defclass contacts-display
-  this data []
-  local-state [new-text ""]
-  render
-  (dom/div
-   (dom/h2 "Contact list")
-   (dom/ul
-    (map (fn [c] (contact-display c this)) data))
-   (dom/div
-    (dom/input {:type "text" :value new-text
-                :onchange (fn [e] (reacl/send-message! this
-                                                       (->NewText (.. e -target -value))))})
-    (dom/button {:onclick (fn [e] (reacl/send-message! this (->Add (parse-contact new-text))))} "Add contact")))
-  handle-message
-  (fn [msg]
-    (println "Msg" msg)
-    (cond
-      (instance? Delete msg)
-      (reacl/return :app-state
-                    (vec (remove (fn [c] (= c (:contact msg))) data)))
-
-      (instance? NewText msg)
-      (reacl/return :local-state (:text msg))
-      
-      (instance? Add msg)
-      (reacl/return :app-state (conj data (:contact msg))
-                    :local-state ""))))
-
+(defrecord Registry [people classes])
 
 (def registry
-  {:people
+  (->Registry
    [{:type :student :first "Ben" :last "Bitdiddle" :email "benb@mit.edu"}
     {:type :student :first "Alyssa" :middle-initial "P" :last "Hacker"
      :email "aphacker@mit.edu"}
@@ -123,152 +47,173 @@
     {:type :student :first "Louis" :last "Reasoner" :email "prolog@mit.edu"}
     {:type :professor :first "Hal" :last "Abelson" :email "evalapply@mit.edu"
      :classes [:6001]}]
-   :classes
-   {:6001 "The Structure and Interpretation of Computer Programs"
-    :6946 "The Structure and Interpretation of Classical Mechanics"
-    :1806 "Linear Algebra"}})
+  {:6001 "The Structure and Interpretation of Computer Programs"
+   :6946 "The Structure and Interpretation of Classical Mechanics"
+   :1806 "Linear Algebra"}))
+
+(reacl/defclass demo
+  this []
+  render
+  (dom/h1 "Reacl Tutorial"))
+
+(reacl/defclass string-display
+  this s []
+  render (dom/h1 s))
+
+(defrecord Delete [contact])
+
+(reacl/defclass contact-display
+  this contact [parent]
+  render
+  (dom/li
+   (dom/span (display-name contact))
+   (dom/button
+    {:onclick (fn [_]
+                (reacl/send-message! parent (->Delete contact)))}
+    "Delete")))
+
+(defrecord NewText [text])
+(defrecord Add [contact])
+
+(reacl/defclass contacts-display
+  this contacts []
+  local-state [new-text ""]
+  render
+  (dom/div
+   (dom/h2 "Contact list")
+   (dom/ul
+    (map (fn [c] (contact-display c this)) contacts))
+   (dom/div
+    (dom/input {:type "text" :value new-text
+                :onchange
+                (fn [e]
+                  (reacl/send-message! this
+                                       (->NewText (.. e -target -value))))})
+    (dom/button {:onclick
+                 (fn [e]
+                   (reacl/send-message! this
+                                        (->Add (parse-contact new-text))))}
+                "Add contact")))
+  handle-message
+  (fn [msg]
+    (cond
+      (instance? Delete msg)
+      (let [d (:contact msg)]
+        (reacl/return :app-state
+                      (vec (remove (fn [c] (= c d)) contacts))))
+      (instance? NewText msg)
+      (reacl/return :local-state (:text msg))
+      (instance? Add msg)
+      (reacl/return :app-state (conj contacts (:contact msg))
+                    :local-state ""))))
 
 (defn student-view
-  [student]
-  (dom/li (display-name student)))
+  [p classes]
+  (dom/li (display-name p)))
 
 (defn professor-view
-  [professor]
+  [p classes]
   (dom/li
-   (dom/div (display-name professor))
+   (dom/div (display-name p))
    (dom/label "Classes")
    (dom/ul
-    (map dom/li (:classes professor)))))
+    (map dom/li (map classes (:classes p))))))
 
-(defmulti entry-view :type)
+(defn person-view
+  [p classes]
+  (case (:type p)
+    :student
+    (student-view p classes)
+    :professor
+    (professor-view p classes)))
 
-(defmethod entry-view :student
-  [person]
-  (student-view person))
-
-(defmethod entry-view :professor
-  [person]
-  (professor-view person))
-
-(defn people [data]
-  (->> data
-    :people
-    (mapv (fn [x]
-            (if (:classes x)
-              (update-in x [:classes]
-                (fn [cs] (mapv (:classes data) cs)))
-               x)))))
-
-(reacl/defclass registry-display
-  this data []
+(reacl/defclass people-display
+  this rg []
   render
   (dom/div
    (dom/h2 "Registry")
-   (dom/ul
-    (map entry-view (people data)))))
+   (map (fn [p] (person-view p (:classes rg))) (:people rg))))
 
-(defn display [show]
-  (if show
+(defrecord EditableLocalState [text editing?])
+
+(defn display-if
+  [b]
+  (if b
     {}
-    {:display "none"}))
-
-(defrecord EditableLocalState
-  [text editing?])
+    {:style {:display "none"}}))
 
 (defrecord Editing [])
 (defrecord CommitEdit [])
 
-(reacl/defclass editable
+(reacl/defclass editable-text
   this text []
-
   local-state [local-state (->EditableLocalState text false)]
-  
-  render
-  (let [editing? (:editing? local-state)
-        ttext (:text local-state)]
-    (dom/li
-     (dom/span {:style (display (not editing?))}
-               text)
-     (dom/input {:style (display editing?)
-                 :value ttext
-                 :onchange (fn [e] (reacl/send-message! this (->NewText (.. e -target -value))))
-                 :onkeydown (fn [e]
-                              (when (= (.-key e) "Enter")
-                                (reacl/send-message! this (->CommitEdit))))
-                 :onblur (fn [e]
-                           (reacl/send-message! this (->CommitEdit)))})
-     (dom/button {:style (display (not editing?))
-                  :onclick (fn [e] (reacl/send-message! this (->Editing)))}
-                 "Edit")))
 
+  render
+  (let [editing? (:editing? local-state)]
+    (dom/li
+     (dom/span (display-if (not editing?))
+               (:text local-state))
+     (dom/input (merge (display-if editing?)
+                       {:value (:text local-state)
+                        :onchange
+                         (fn [e]
+                           (reacl/send-message! this
+                                                (->NewText (.. e -target -value))))
+                        :onkeydown (fn [e]
+                                     (when (= (.-key e) "Enter")
+                                       (reacl/send-message! this (->CommitEdit))))}))
+                
+     (dom/button (merge (display-if (not editing?))
+                        {:onclick
+                         (fn [e]
+                           (reacl/send-message! this (->Editing)))})
+                 "Edit")))
   handle-message
   (fn [msg]
     (cond
       (instance? Editing msg)
       (reacl/return :local-state
                     (assoc local-state :editing? true))
-
       (instance? NewText msg)
       (reacl/return :local-state
                     (assoc local-state :text (:text msg)))
-
       (instance? CommitEdit msg)
       (reacl/return :local-state
                     (assoc local-state :editing? false)
                     :app-state
                     (:text local-state)))))
-                    
-(defrecord ChangeClassName [key name])
+
+(defrecord NewName [key name])
 
 (reacl/defclass classes-display
-  this data []
-
+  this classes []
   render
-  (dom/div {:id "classes"}
-           (dom/h2 "Classes")
-           (map (fn [[key name]] (editable (reacl/opt :reaction (reacl/reaction this (fn [name] (->ChangeClassName key name)))) name))
-                (:classes data)))
-
+  (dom/div
+   (dom/h2 "Classes")
+   (map (fn [[key name]] (editable-text
+                          (reacl/opt :reaction
+                                     (reacl/reaction this
+                                                     (partial ->NewName key)))
+                          name))
+        classes))
   handle-message
   (fn [msg]
-    (cond
-      (instance? ChangeClassName msg)
-      (reacl/return :app-state
-                    (assoc-in data [:classes (:key msg)] (:name msg))))))
-      
-;; string-display
-#_ (def top
-  (reacl/render-component
-   (.getElementById js/document "content")
-   string-display "Hello world!" reacl/no-reaction))
-
-;; list-display
-#_(def top
-  (reacl/render-component
-   (.getElementById js/document "content")
-   list-display ["Lion" "Zebra" "Buffalo" "Antelope"] reacl/no-reaction))
-
-;; contacts
-#_(def top
-  (reacl/render-component
-   (.getElementById js/document "content")
-   contacts-display contacts reacl/no-reaction))
-
-;; registry
-#_(def top
-  (reacl/render-component
-   (.getElementById js/document "content")
-   registry-display registry reacl/no-reaction))
-
-;; registry + classes
-
-(def registry-top
-  (reacl/render-component
-   (.getElementById js/document "registry")
-   registry-display registry reacl/no-reaction))
-
-(def classes-top
-  (reacl/render-component
-   (.getElementById js/document "classes")
-   classes-display registry reacl/no-reaction))
-
+    (reacl/return :app-state
+                  (assoc classes (:key msg) (:name msg)))))
+          
+(reacl/defclass registry-display
+  this rg []
+  render
+  (do
+    (println rg)
+  (dom/div
+   (people-display rg)
+   (classes-display (reacl/opt :embed-app-state
+                               (fn [rg new-classes]
+                                 (assoc rg :classes new-classes)))
+                    (:classes rg)))))
+   
+(reacl/render-component
+ (.getElementById js/document "content")
+ registry-display registry)
